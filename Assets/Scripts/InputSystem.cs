@@ -1,0 +1,36 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class InputSystem : MonoBehaviour
+{
+    public Action<MoveDirection> Move; 
+    public Action<MoveDirection> Up; 
+    public Action<MoveDirection> Down; 
+    
+    private static readonly Dictionary<Key, MoveDirection> bindings = new()
+    {
+        { Key.W, MoveDirection.FORWARD },
+        { Key.S, MoveDirection.BACK },
+        { Key.A, MoveDirection.LEFT },
+        { Key.D, MoveDirection.RIGHT },
+        { Key.Space, MoveDirection.UP },
+        { Key.LeftCtrl, MoveDirection.DOWN }
+    };
+    
+    private void FixedUpdate()
+    {
+        foreach (var (key, direction) in bindings)
+        {
+            if (Keyboard.current[key].isPressed)
+                Move?.Invoke(direction);
+            
+            if (Keyboard.current[key].wasPressedThisFrame)
+                Down?.Invoke(direction);
+
+            if (Keyboard.current[key].wasReleasedThisFrame)
+                Up?.Invoke(direction);
+        }
+    }
+}
