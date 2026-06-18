@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class WidgetLayer : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI message;
+    [SerializeField] private TextMeshProUGUI container;
     [SerializeField] private float timer;
     
     private Coroutine coroutine;
     
-    public void Warning(in MoveDirection direction)
+    public void Warning(string message)
     {
         if (coroutine != null)
             StopCoroutine(coroutine);
 
-        message.text = $"You can`t move {direction}";
+        container.text = message;
         coroutine = StartCoroutine(Warning());
     }
 
@@ -22,6 +22,6 @@ public class WidgetLayer : MonoBehaviour
     {
         yield return new WaitForSeconds(timer);
         
-        message.text = null;
+        container.text = null;
     }
 }

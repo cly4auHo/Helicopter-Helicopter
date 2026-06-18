@@ -19,8 +19,8 @@ public class UIManager : MonoBehaviour
         infoLayer.UpdateInfo(speed, height);
     }
     
-    public void Warning(in MoveDirection direction)
+    public void Warning(string message)
     {
-        widgetLayer.Warning(direction);
+        widgetLayer.Warning(message);
     }
 }

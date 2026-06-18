@@ -253,5 +253,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54c44d86a3b355f4db568a04b5868089, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WidgetLayer
-  message: {fileID: 4623236698176845877}
+  container: {fileID: 4623236698176845877}
   timer: 1

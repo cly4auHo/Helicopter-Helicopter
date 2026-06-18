@@ -15,6 +15,8 @@ public class InputSystem : MonoBehaviour
         { Key.S, MoveDirection.BACK },
         { Key.A, MoveDirection.LEFT },
         { Key.D, MoveDirection.RIGHT },
+        { Key.Q, MoveDirection.TURN_LEFT },
+        { Key.E, MoveDirection.TURN_RIGHT },
         { Key.Space, MoveDirection.UP },
         { Key.LeftCtrl, MoveDirection.DOWN }
     };
@@ -25,10 +27,16 @@ public class InputSystem : MonoBehaviour
         {
             if (Keyboard.current[key].isPressed)
                 Move?.Invoke(direction);
-            
+        }
+    }
+
+    private void Update()
+    {
+        foreach (var (key, direction) in bindings)
+        {
             if (Keyboard.current[key].wasPressedThisFrame)
                 Down?.Invoke(direction);
-
+            
             if (Keyboard.current[key].wasReleasedThisFrame)
                 Up?.Invoke(direction);
         }

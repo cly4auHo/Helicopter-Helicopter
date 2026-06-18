@@ -6,4 +6,6 @@ public enum MoveDirection
     BACK,
     LEFT,
     RIGHT,
+    TURN_LEFT,
+    TURN_RIGHT
 }
