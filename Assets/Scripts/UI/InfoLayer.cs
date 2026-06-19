@@ -8,7 +8,7 @@ public class InfoLayer : MonoBehaviour
     
     public void UpdateInfo(in float speed, in float height)
     {
-        speedIndicator.text = $"{speed}";
-        heightIndicator.text = $"{height}";
+        speedIndicator.text = $"{speed:F2}";
+        heightIndicator.text = $"{height:F2}";
     }
 }
