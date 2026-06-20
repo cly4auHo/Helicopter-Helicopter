@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Physics.gravity = new Vector3(0, gravity, 0);
+        
         helicopter = Instantiate(helicopterPrefab);
         helicopter.Init(inputSystem);
         cameraController = Instantiate(cameraControllerPrefab);

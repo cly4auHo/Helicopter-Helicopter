@@ -27,19 +27,14 @@ public class Helicopter : MonoBehaviour
     
     private InputSystem inputSystem;
     private Vector2 torqueForce;
-    private Dimension direction;
-    private Dimension turn;
-    private Dimension torque;
     private bool grounded;
     private float engineAcceleration;
-    private float hTurn;
+    private float turnRate;
     
     public void Init(InputSystem input)
     {
         inputSystem = input;
         inputSystem.Move += MovementListener;
-        inputSystem.Up += KeyUp;
-        inputSystem.Down += KeyDown;
     }
     
     private void FixedUpdate()
@@ -47,21 +42,21 @@ public class Helicopter : MonoBehaviour
         ApplyAcceleration();
         ApplyTorque();
         ApplyTilt();
+        
         IndicatorsUpdate?.Invoke(engineAcceleration, transform.position.y);
     }
 
     private void ApplyAcceleration()
     {
-        rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration * rigidbody.mass, 0));
+        rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration * rigidbody.mass));
     }
     
     private void ApplyTorque()
     {
         var turn = turnForce * Mathf.Lerp(torqueForce.x, torqueForce.x * (turnTiltForcePercent - Mathf.Abs(torqueForce.y)), Mathf.Max(0, torqueForce.y));
-        hTurn = Mathf.Lerp(hTurn, turn, Time.fixedDeltaTime * turnForce);
-        
-        rigidbody.AddRelativeTorque(0, hTurn * rigidbody.mass, 0);
-        rigidbody.AddRelativeForce(new Vector3(0, 0, Mathf.Max(0f, torqueForce.y * forwardForce * rigidbody.mass)));
+        turnRate = Mathf.Lerp(turnRate, turn, Time.fixedDeltaTime * turnForce);
+        rigidbody.AddRelativeTorque(0, turnRate * rigidbody.mass, 0);
+        rigidbody.AddRelativeForce(new Vector3(0, 0, Mathf.Max(0, torqueForce.y * forwardForce * rigidbody.mass)));
     }
 
     private void ApplyTilt()
@@ -75,16 +70,16 @@ public class Helicopter : MonoBehaviour
     
     private void MovementListener(MoveDirection moveDirection)
     {
-        var torqueForce = 0f;
+        var force = 0f;
         
-        var x = this.torqueForce.x switch
+        var x = torqueForce.x switch
         {
             > 0 => -Time.fixedDeltaTime,
             < 0 => Time.fixedDeltaTime,
             _ => 0
         };
         
-        var y = this.torqueForce.y switch
+        var y = torqueForce.y switch
         {
             > 0 => -Time.fixedDeltaTime,
             < 0 => Time.fixedDeltaTime,
@@ -111,8 +106,8 @@ public class Helicopter : MonoBehaviour
                     Message?.Invoke("You are on ground");
                     break;
                 }
-                if (direction == Dimension.FORWARD)
-                    y = Time.fixedDeltaTime;
+                
+                y = Time.fixedDeltaTime;
                 break;
             case MoveDirection.BACK:
                 if (grounded)
@@ -121,8 +116,7 @@ public class Helicopter : MonoBehaviour
                     break;
                 }
                 
-                if (direction == Dimension.BACKWARD)
-                    y = -Time.fixedDeltaTime;
+                y = -Time.fixedDeltaTime;
                 break;
             case MoveDirection.LEFT:
                 if (grounded)
@@ -149,8 +143,8 @@ public class Helicopter : MonoBehaviour
                     break;
                 }
                 
-                torqueForce = -(turnForcePercent - Mathf.Abs(this.torqueForce.y)) * rigidbody.mass;
-                rigidbody.AddRelativeTorque(0, torqueForce, 0);
+                force = Mathf.Abs(torqueForce.y) - turnForcePercent;
+                rigidbody.AddRelativeTorque(0, force * rigidbody.mass, 0);
                 break;
             case MoveDirection.TURN_RIGHT:
                 if (grounded)
@@ -158,74 +152,14 @@ public class Helicopter : MonoBehaviour
                     Message?.Invoke("You are on ground");
                     break;
                 }
-                        
-                torqueForce = (turnForcePercent - Mathf.Abs(this.torqueForce.y)) * rigidbody.mass;
-                rigidbody.AddRelativeTorque(0, torqueForce, 0);
+                
+                force = turnForcePercent - Mathf.Abs(torqueForce.y);
+                rigidbody.AddRelativeTorque(0, force * rigidbody.mass, 0);
                 break;
         }
         
-        this.torqueForce.x = Mathf.Clamp(this.torqueForce.x + x, -1, 1);
-        this.torqueForce.y = Mathf.Clamp(this.torqueForce.y + y, -1, 1);
-    }
-    
-    private void KeyUp(MoveDirection moveDirection)
-    {
-        switch (moveDirection)
-        {
-            case MoveDirection.FORWARD:
-                if (direction == Dimension.FORWARD)
-                    direction = Dimension.NONE;
-                break;
-            case MoveDirection.BACK:
-                if (direction == Dimension.BACKWARD)
-                    direction = Dimension.NONE;
-                break;
-            case MoveDirection.LEFT:
-                break;
-            case MoveDirection.RIGHT:
-                break;
-            case MoveDirection.TURN_LEFT:
-                break;
-            case MoveDirection.TURN_RIGHT:
-                break;
-        }
-    }
-    
-    private void KeyDown(MoveDirection moveDirection)
-    {
-        if (moveDirection != MoveDirection.UP && grounded)
-        {
-            Message?.Invoke("You are on ground");
-            return;
-        }
-        
-        switch (moveDirection)
-        {
-            case MoveDirection.FORWARD:
-                if (direction == Dimension.NONE)
-                    direction = Dimension.FORWARD;
-                else
-                    Message?.Invoke("You move backward");
-                break;
-            case MoveDirection.BACK:
-                if (direction == Dimension.NONE)
-                    direction = Dimension.BACKWARD;
-                else
-                    Message?.Invoke("You move forward");
-                break;
-            case MoveDirection.LEFT:
-                
-                break;
-            case MoveDirection.RIGHT:
-                
-                break;
-            case MoveDirection.TURN_LEFT:
-                
-                break;
-            case MoveDirection.TURN_RIGHT:
-                
-                break;
-        }
+        torqueForce.x = Mathf.Clamp(torqueForce.x + x, -1, 1);
+        torqueForce.y = Mathf.Clamp(torqueForce.y + y, -1, 1);
     }
     
     private void OnCollisionEnter()
@@ -241,11 +175,7 @@ public class Helicopter : MonoBehaviour
     private void OnDestroy()
     {
         if (inputSystem)
-        {
             inputSystem.Move -= MovementListener;
-            inputSystem.Up -= KeyUp;
-            inputSystem.Down -= KeyDown;
-        }
         
         Destroy?.Invoke();
     }
