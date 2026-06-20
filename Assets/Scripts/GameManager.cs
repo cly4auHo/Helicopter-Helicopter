@@ -38,6 +38,9 @@ public class GameManager : MonoBehaviour
     
     private void OnHelicopterDestroy()
     {
+        if (!helicopter)
+            return;
+        
         helicopter.Message -= OnHelicopterMessage;
         helicopter.IndicatorsUpdate -= OnHelicopterUpdateIndicators;
         helicopter.Destroy -= OnHelicopterDestroy;
