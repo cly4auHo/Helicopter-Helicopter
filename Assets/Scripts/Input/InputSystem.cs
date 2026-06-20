@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 public class InputSystem : MonoBehaviour
 {
     public Action<MoveDirection> Move;
+    public Action<MoveDirection> Up; 
+    public Action<MoveDirection> Down; 
     
     private static readonly Dictionary<Key, MoveDirection> bindings = new()
     {
@@ -25,6 +27,18 @@ public class InputSystem : MonoBehaviour
         {
             if (Keyboard.current[key].isPressed)
                 Move?.Invoke(direction);
+        }
+    }
+    
+    private void Update()
+    {
+        foreach (var (key, direction) in bindings)
+        {
+            if (Keyboard.current[key].wasPressedThisFrame)
+                Down?.Invoke(direction);
+            
+            if (Keyboard.current[key].wasReleasedThisFrame)
+                Up?.Invoke(direction);
         }
     }
 }

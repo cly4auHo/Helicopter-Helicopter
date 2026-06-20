@@ -20,6 +20,7 @@ public class Helicopter : MonoBehaviour
     [SerializeField] private float turnForce;
     
     [Header("Tilt")]
+    [SerializeField] private float sideForce;
     [SerializeField] private float turnTiltForce;
     [SerializeField] private float forwardTiltForce;
     [SerializeField] private float turnForcePercent;
@@ -28,13 +29,18 @@ public class Helicopter : MonoBehaviour
     private InputSystem inputSystem;
     private Vector2 torqueForce;
     private bool grounded;
+    private bool isEngineAccelerationChanged;
     private float engineAcceleration;
+    private float targetAcceleration;
     private float turnRate;
     
     public void Init(InputSystem input)
     {
         inputSystem = input;
+        targetAcceleration = Physics.gravity.magnitude;
         inputSystem.Move += MovementListener;
+        inputSystem.Up += KeyUpListener;
+        inputSystem.Down += KeyDownListener;
     }
     
     private void FixedUpdate()
@@ -49,6 +55,14 @@ public class Helicopter : MonoBehaviour
     private void ApplyAcceleration()
     {
         rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration * rigidbody.mass));
+        
+        if (grounded || isEngineAccelerationChanged)
+            return;
+        
+        if (engineAcceleration > targetAcceleration)
+            engineAcceleration = Mathf.Clamp(engineAcceleration - downForce, targetAcceleration, engineAcceleration);
+        else if (engineAcceleration < targetAcceleration)
+            engineAcceleration = Mathf.Clamp(engineAcceleration + upForce, engineAcceleration, targetAcceleration);
     }
     
     private void ApplyTorque()
@@ -56,7 +70,7 @@ public class Helicopter : MonoBehaviour
         var turn = turnForce * Mathf.Lerp(torqueForce.x, torqueForce.x * (turnTiltForcePercent - Mathf.Abs(torqueForce.y)), Mathf.Max(0, torqueForce.y));
         turnRate = Mathf.Lerp(turnRate, turn, Time.fixedDeltaTime * turnForce);
         rigidbody.AddRelativeTorque(0, turnRate * rigidbody.mass, 0);
-        rigidbody.AddRelativeForce(new Vector3(0, 0, Mathf.Max(0, torqueForce.y * forwardForce * rigidbody.mass)));
+        rigidbody.AddRelativeForce(new Vector3(torqueForce.x * sideForce * rigidbody.mass, 0, torqueForce.y * forwardForce * rigidbody.mass));
     }
 
     private void ApplyTilt()
@@ -161,6 +175,18 @@ public class Helicopter : MonoBehaviour
         torqueForce.x = Mathf.Clamp(torqueForce.x + x, -1, 1);
         torqueForce.y = Mathf.Clamp(torqueForce.y + y, -1, 1);
     }
+
+    private void KeyUpListener(MoveDirection moveDirection)
+    {
+        if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
+            isEngineAccelerationChanged = false;
+    }
+    
+    private void KeyDownListener(MoveDirection moveDirection)
+    {
+        if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
+            isEngineAccelerationChanged = true;
+    }
     
     private void OnCollisionEnter()
     {
@@ -175,7 +201,11 @@ public class Helicopter : MonoBehaviour
     private void OnDestroy()
     {
         if (inputSystem)
+        {
             inputSystem.Move -= MovementListener;
+            inputSystem.Up -= KeyUpListener;
+            inputSystem.Down -= KeyDownListener;
+        }
         
         Destroy?.Invoke();
     }

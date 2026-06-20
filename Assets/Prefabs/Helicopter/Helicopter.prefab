@@ -216,8 +216,8 @@ Rigidbody:
   m_GameObject: {fileID: 6002326990849749964}
   serializedVersion: 5
   m_Mass: 100
-  m_LinearDamping: 1
-  m_AngularDamping: 4
+  m_LinearDamping: 0.3
+  m_AngularDamping: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -232,7 +232,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!65 &8211873758863674519
 BoxCollider:
@@ -273,9 +273,10 @@ MonoBehaviour:
   turnTiltForcePercent: 1.5
   forwardForce: 10
   turnForce: 3
+  sideForce: 1
   turnTiltForce: 0.3
   forwardTiltForce: 3
-  turnForcePercent: 4.2
+  turnForcePercent: 1.2
   tiltCoefficient: 5
 --- !u!1 &8481445345287283423
 GameObject:

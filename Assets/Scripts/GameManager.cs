@@ -8,15 +8,12 @@ public class GameManager : MonoBehaviour
     
     [SerializeField] private Helicopter helicopterPrefab;
     [SerializeField] private CameraController cameraControllerPrefab;
-    [SerializeField] private float gravity;
     
     private Helicopter helicopter;
     private CameraController cameraController;
     
     private void Start()
     {
-        Physics.gravity = new Vector3(0, gravity, 0);
-        
         helicopter = Instantiate(helicopterPrefab);
         helicopter.Init(inputSystem);
         cameraController = Instantiate(cameraControllerPrefab);
