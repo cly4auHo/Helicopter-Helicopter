@@ -270,7 +270,7 @@ MonoBehaviour:
   rigidbody: {fileID: 8148949511250024358}
   heightLimit: 100
   upForce: 0.1
-  downForce: 0.12
+  downForce: 0.1
   turnTiltForcePercent: 1.5
   forwardForce: 10
   turnForce: 3

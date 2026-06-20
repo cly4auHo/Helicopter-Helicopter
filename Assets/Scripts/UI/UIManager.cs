@@ -14,9 +14,9 @@ public class UIManager : MonoBehaviour
         widgetLayer = Instantiate(widgetLayerPrefab);
     }
 
-    public void UpdateInfo(in float speed, in float height)
+    public void UpdateInfo(in float acceleration, in float height)
     {
-        infoLayer.UpdateInfo(speed, height);
+        infoLayer.UpdateInfo(acceleration, height);
     }
     
     public void Warning(string message)

@@ -94,8 +94,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -151,7 +151,7 @@ GameObject:
   - component: {fileID: 5764734306306813328}
   - component: {fileID: 422433120015333068}
   m_Layer: 5
-  m_Name: Speed Value
+  m_Name: Acceleration Value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -395,7 +395,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc74ee4a58f930d4a90fc1dff187a23b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InfoLayer
-  speedIndicator: {fileID: 422433120015333068}
+  accelerationIndicator: {fileID: 422433120015333068}
   heightIndicator: {fileID: 825144551202827599}
 --- !u!1 &6833111421980586286
 GameObject:
@@ -546,7 +546,7 @@ GameObject:
   - component: {fileID: 8424940267767049784}
   - component: {fileID: 5072157029714688289}
   m_Layer: 5
-  m_Name: Speed Indicator
+  m_Name: Acceleration Indicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -599,7 +599,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Speed
+  m_text: 'Acceleration
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -626,8 +628,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
