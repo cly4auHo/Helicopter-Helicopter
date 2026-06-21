@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Helicopter : MonoBehaviour
@@ -9,10 +10,11 @@ public class Helicopter : MonoBehaviour
     
     [Header("Physics")]
     [SerializeField] private Rigidbody rigidbody;
-    
-    [Header("Engine")]
+
+    [Header("Engine")] 
     [SerializeField] private float upForce;
     [SerializeField] private float downForce;
+    [SerializeField] private float forwardForce;
     
     [Header("Pitch")]
     [SerializeField] private float forwardTiltForce;
@@ -24,15 +26,17 @@ public class Helicopter : MonoBehaviour
     [SerializeField] private float torqueCoefficient;
     
     private InputSystem inputSystem;
+    private List<MoveDirection> moveDirections;
     private Vector2 tiltForce;
+    private Vector2 tilt;
     private bool grounded;
     private bool isEngineAccelerationChanged;
-    private bool isControllersOnHold;
     private float engineAcceleration;
     private float targetAcceleration;
     
     public void Init(InputSystem input)
     {
+        moveDirections = new List<MoveDirection>();
         inputSystem = input;
         targetAcceleration = Physics.gravity.magnitude;
         inputSystem.Move += MovementListener;
@@ -45,15 +49,15 @@ public class Helicopter : MonoBehaviour
         ApplyAcceleration();
         ApplyTilt();
         
-        if (!isControllersOnHold)
-            tiltForce = Vector2.MoveTowards(tiltForce, Vector2.zero, Time.fixedDeltaTime);
+        if (moveDirections.Count == 0)
+            tiltForce = Vector2.Lerp(tiltForce, Vector2.zero, Time.fixedDeltaTime);
         
         IndicatorsUpdate?.Invoke(engineAcceleration, transform.position.y);
     }
 
     private void ApplyAcceleration()
     {
-        rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration ), ForceMode.Acceleration);
+        rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration, tiltForce.y * forwardForce), ForceMode.Acceleration);
         
         if (isEngineAccelerationChanged)
             return;
@@ -79,20 +83,6 @@ public class Helicopter : MonoBehaviour
     
     private void MovementListener(MoveDirection moveDirection)
     {
-        var x = tiltForce.x switch
-        {
-            > 0 => -Time.fixedDeltaTime,
-            < 0 => Time.fixedDeltaTime,
-            _ => 0
-        };
-        
-        var y = tiltForce.y switch
-        {
-            > 0 => -Time.fixedDeltaTime,
-            < 0 => Time.fixedDeltaTime,
-            _ => 0
-        };
-
         switch (moveDirection)
         {
             case MoveDirection.UP:
@@ -109,28 +99,28 @@ public class Helicopter : MonoBehaviour
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
-                    y = Time.fixedDeltaTime;
+                    tiltForce.y = Mathf.Clamp(tiltForce.y + Time.fixedDeltaTime, -1, 1);
                 
                 break;
             case MoveDirection.BACK:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
-                    y = -Time.fixedDeltaTime;
+                    tiltForce.y = Mathf.Clamp(tiltForce.y - Time.fixedDeltaTime, -1, 1);
                 
                 break;
             case MoveDirection.LEFT:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
-                    x = -Time.fixedDeltaTime;
+                    tiltForce.x = Mathf.Clamp(tiltForce.x - Time.fixedDeltaTime, -1, 1);
                 
                 break;
             case MoveDirection.RIGHT:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
-                    x = Time.fixedDeltaTime;
+                    tiltForce.x = Mathf.Clamp(tiltForce.x + Time.fixedDeltaTime, -1, 1);
                 
                 break;
             case MoveDirection.TURN_LEFT:
@@ -148,9 +138,6 @@ public class Helicopter : MonoBehaviour
                 
                 break;
         }
-        
-        tiltForce.x = Mathf.Clamp(tiltForce.x + x, -1, 1);
-        tiltForce.y = Mathf.Clamp(tiltForce.y + y, -1, 1);
     }
 
     private void KeyUpListener(MoveDirection moveDirection)
@@ -158,7 +145,7 @@ public class Helicopter : MonoBehaviour
         if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
             isEngineAccelerationChanged = false;
         else
-            isControllersOnHold = false;
+            moveDirections.Remove(moveDirection);
     }
 
     private void KeyDownListener(MoveDirection moveDirection)
@@ -166,7 +153,7 @@ public class Helicopter : MonoBehaviour
         if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
             isEngineAccelerationChanged = true;
         else
-            isControllersOnHold = true;
+            moveDirections.Add(moveDirection);
     }
 
     private void OnCollisionEnter()
