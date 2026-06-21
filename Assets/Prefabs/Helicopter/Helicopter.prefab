@@ -215,7 +215,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6002326990849749964}
   serializedVersion: 5
-  m_Mass: 100
+  m_Mass: 1000
   m_LinearDamping: 0.3
   m_AngularDamping: 2
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -270,9 +270,9 @@ MonoBehaviour:
   rigidbody: {fileID: 8148949511250024358}
   upForce: 0.1
   downForce: 0.1
-  forwardTiltForce: 7
-  turnTiltForce: 3
-  torqueCoefficient: 0.73
+  forwardTiltForce: 10
+  turnTiltForce: 5
+  torqueCoefficient: 0.5
 --- !u!1 &8481445345287283423
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,6 +27,7 @@ public class Helicopter : MonoBehaviour
     private Vector2 tiltForce;
     private bool grounded;
     private bool isEngineAccelerationChanged;
+    private bool isControllersOnHold;
     private float engineAcceleration;
     private float targetAcceleration;
     
@@ -44,12 +45,15 @@ public class Helicopter : MonoBehaviour
         ApplyAcceleration();
         ApplyTilt();
         
+        if (!isControllersOnHold)
+            tiltForce = Vector2.MoveTowards(tiltForce, Vector2.zero, Time.fixedDeltaTime);
+        
         IndicatorsUpdate?.Invoke(engineAcceleration, transform.position.y);
     }
 
     private void ApplyAcceleration()
     {
-        rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration * rigidbody.mass));
+        rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration ), ForceMode.Acceleration);
         
         if (isEngineAccelerationChanged)
             return;
@@ -133,14 +137,14 @@ public class Helicopter : MonoBehaviour
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
-                    rigidbody.AddRelativeTorque(0, -torqueCoefficient * rigidbody.mass, 0);    
+                    rigidbody.AddRelativeTorque(0, -torqueCoefficient, 0, ForceMode.Acceleration);    
                 
                 break;
             case MoveDirection.TURN_RIGHT:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
-                    rigidbody.AddRelativeTorque(0, torqueCoefficient * rigidbody.mass, 0);
+                    rigidbody.AddRelativeTorque(0, torqueCoefficient, 0, ForceMode.Acceleration);
                 
                 break;
         }
@@ -153,14 +157,18 @@ public class Helicopter : MonoBehaviour
     {
         if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
             isEngineAccelerationChanged = false;
+        else
+            isControllersOnHold = false;
     }
-    
+
     private void KeyDownListener(MoveDirection moveDirection)
     {
         if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
             isEngineAccelerationChanged = true;
+        else
+            isControllersOnHold = true;
     }
-    
+
     private void OnCollisionEnter()
     {
         grounded = true;
