@@ -26,17 +26,17 @@ public class Helicopter : MonoBehaviour
     [SerializeField] private float torqueCoefficient;
     
     private InputSystem inputSystem;
-    private List<MoveDirection> moveDirections;
     private Vector2 tiltForce;
     private Vector2 tilt;
     private bool grounded;
     private bool isEngineAccelerationChanged;
+    private bool isRolling;
+    private bool isPitching;
     private float engineAcceleration;
     private float targetAcceleration;
     
     public void Init(InputSystem input)
     {
-        moveDirections = new List<MoveDirection>();
         inputSystem = input;
         targetAcceleration = Physics.gravity.magnitude;
         inputSystem.Move += MovementListener;
@@ -48,9 +48,7 @@ public class Helicopter : MonoBehaviour
     {
         ApplyAcceleration();
         ApplyTilt();
-        
-        if (moveDirections.Count == 0)
-            tiltForce = Vector2.Lerp(tiltForce, Vector2.zero, Time.fixedDeltaTime);
+        ApplyAlignment();
         
         IndicatorsUpdate?.Invoke(engineAcceleration, transform.position.y);
     }
@@ -76,9 +74,19 @@ public class Helicopter : MonoBehaviour
     
     private void ApplyTilt()
     {
-        var pitch = tiltForce.y * forwardTiltForce;
-        var roll = -tiltForce.x * turnTiltForce;
-        rigidbody.AddRelativeTorque(pitch, 0, roll);
+        tilt.x = Mathf.Lerp(tilt.x, tiltForce.x * turnTiltForce, Time.fixedDeltaTime);
+        tilt.y = Mathf.Lerp(tilt.y, tiltForce.y * forwardTiltForce, Time.fixedDeltaTime);
+        
+        rigidbody.MoveRotation(Quaternion.Euler(tilt.y, transform.localEulerAngles.y, -tilt.x));
+    }
+
+    private void ApplyAlignment()
+    {
+        if (!isPitching)
+            tiltForce.y = Mathf.Lerp(tiltForce.y, 0, Time.fixedDeltaTime);
+
+        if (!isRolling)
+            tiltForce.x = Mathf.Lerp(tiltForce.x, 0, Time.fixedDeltaTime);
     }
     
     private void MovementListener(MoveDirection moveDirection)
@@ -142,18 +150,22 @@ public class Helicopter : MonoBehaviour
 
     private void KeyUpListener(MoveDirection moveDirection)
     {
-        if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
+        if (moveDirection == MoveDirection.FORWARD || moveDirection == MoveDirection.BACK)
+            isPitching = false;
+        else if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
             isEngineAccelerationChanged = false;
-        else
-            moveDirections.Remove(moveDirection);
+        else if (moveDirection == MoveDirection.LEFT || moveDirection == MoveDirection.RIGHT)
+            isRolling = false;
     }
 
     private void KeyDownListener(MoveDirection moveDirection)
     {
-        if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
+        if (moveDirection == MoveDirection.FORWARD || moveDirection == MoveDirection.BACK)
+            isPitching = true;
+        else if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
             isEngineAccelerationChanged = true;
-        else
-            moveDirections.Add(moveDirection);
+        else if (moveDirection == MoveDirection.LEFT || moveDirection == MoveDirection.RIGHT)
+            isRolling = true;
     }
 
     private void OnCollisionEnter()
