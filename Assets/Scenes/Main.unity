@@ -400,7 +400,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   helicopterPrefab: {fileID: 8048375021831155887, guid: 4144b541404695f47af7b6ee58af7e0e, type: 3}
   cameraControllerPrefab: {fileID: -154617839073767892, guid: 47fbdd2f99889674aa85c41c4affb3b0, type: 3}
-  gravity: -10
 --- !u!4 &639492272
 Transform:
   m_ObjectHideFlags: 0
@@ -631,7 +630,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: -876546973899608171, guid: 124c112a6e8f1a54e8b0870e881b56d8, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

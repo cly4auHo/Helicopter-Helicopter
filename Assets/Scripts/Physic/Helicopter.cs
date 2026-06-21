@@ -56,8 +56,14 @@ public class Helicopter : MonoBehaviour
     {
         rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration * rigidbody.mass));
         
-        if (grounded || isEngineAccelerationChanged)
+        if (isEngineAccelerationChanged)
             return;
+        
+        if (grounded)
+        {
+            engineAcceleration = Mathf.Clamp(engineAcceleration - downForce, 0, engineAcceleration);
+            return;
+        }
         
         if (engineAcceleration > targetAcceleration)
             engineAcceleration = Mathf.Clamp(engineAcceleration - downForce, targetAcceleration, engineAcceleration);
