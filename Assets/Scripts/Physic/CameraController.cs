@@ -16,6 +16,6 @@ public class CameraController : MonoBehaviour
     private void LateUpdate()
     {
         transform.position = target.position + target.rotation * offsetPosition;
-        transform.rotation = target.rotation;
+        transform.rotation = Quaternion.Euler(new Vector3(startRotation.x, target.rotation.eulerAngles.y, startRotation.z));
     }
 }

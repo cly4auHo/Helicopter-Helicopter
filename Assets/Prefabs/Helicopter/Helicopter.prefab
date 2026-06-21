@@ -270,9 +270,10 @@ MonoBehaviour:
   rigidbody: {fileID: 8148949511250024358}
   upForce: 0.1
   downForce: 0.1
-  forwardTiltForce: 10
-  turnTiltForce: 5
-  torqueCoefficient: 0.5
+  forwardForce: 10
+  forwardTiltForce: 20
+  turnTiltForce: 30
+  torqueCoefficient: 1
 --- !u!1 &8481445345287283423
 GameObject:
   m_ObjectHideFlags: 0
