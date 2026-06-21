@@ -5,10 +5,7 @@ using UnityEngine.InputSystem;
 
 public class InputSystem : MonoBehaviour
 {
-    public Action<MoveDirection> Move;
-    public Action<MoveDirection> Up; 
-    public Action<MoveDirection> Down; 
-    
+    #region bindings
     private static readonly Dictionary<Key, MoveDirection> bindings = new()
     {
         { Key.W, MoveDirection.FORWARD },
@@ -20,6 +17,11 @@ public class InputSystem : MonoBehaviour
         { Key.Space, MoveDirection.UP },
         { Key.LeftCtrl, MoveDirection.DOWN }
     };
+    #endregion
+    
+    public Action<MoveDirection> Move;
+    public Action<MoveDirection> Up; 
+    public Action<MoveDirection> Down; 
     
     private void FixedUpdate()
     {
