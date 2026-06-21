@@ -271,6 +271,7 @@ MonoBehaviour:
   upForce: 0.1
   downForce: 0.1
   forwardForce: 25
+  sideForce: 10
   forwardTiltForce: 10
   turnTiltForce: 15
   torqueCoefficient: 1

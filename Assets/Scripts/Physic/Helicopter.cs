@@ -14,6 +14,7 @@ public class Helicopter : MonoBehaviour
     [SerializeField] private float upForce;
     [SerializeField] private float downForce;
     [SerializeField] private float forwardForce;
+    [SerializeField] private float sideForce;
     
     [Header("Pitch")]
     [SerializeField] private float forwardTiltForce;
@@ -54,7 +55,7 @@ public class Helicopter : MonoBehaviour
 
     private void ApplyAcceleration()
     {
-        rigidbody.AddRelativeForce(new Vector3(0, engineAcceleration, tiltForce.y * forwardForce), ForceMode.Acceleration);
+        rigidbody.AddRelativeForce(new Vector3(tiltForce.x * sideForce, engineAcceleration, tiltForce.y * forwardForce), ForceMode.Acceleration);
         
         if (isEngineAccelerationChanged)
             return;
