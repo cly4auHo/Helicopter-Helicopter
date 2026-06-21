@@ -14,25 +14,21 @@ public class Helicopter : MonoBehaviour
     [SerializeField] private float upForce;
     [SerializeField] private float downForce;
     
-    [Header("Torque")]
-    [SerializeField] private float turnTiltForcePercent;
-    [SerializeField] private float forwardForce;
-    [SerializeField] private float turnForce;
-    
-    [Header("Tilt")]
-    [SerializeField] private float sideForce;
-    [SerializeField] private float turnTiltForce;
+    [Header("Pitch")]
     [SerializeField] private float forwardTiltForce;
-    [SerializeField] private float turnForcePercent;
-    [SerializeField] private float tiltCoefficient;
+    
+    [Header("Roll")]
+    [SerializeField] private float turnTiltForce;
+    
+    [Header("Yaw")]
+    [SerializeField] private float torqueCoefficient;
     
     private InputSystem inputSystem;
-    private Vector2 torqueForce;
+    private Vector2 tiltForce;
     private bool grounded;
     private bool isEngineAccelerationChanged;
     private float engineAcceleration;
     private float targetAcceleration;
-    private float turnRate;
     
     public void Init(InputSystem input)
     {
@@ -46,7 +42,6 @@ public class Helicopter : MonoBehaviour
     private void FixedUpdate()
     {
         ApplyAcceleration();
-        ApplyTorque();
         ApplyTilt();
         
         IndicatorsUpdate?.Invoke(engineAcceleration, transform.position.y);
@@ -71,35 +66,23 @@ public class Helicopter : MonoBehaviour
             engineAcceleration = Mathf.Clamp(engineAcceleration + upForce, engineAcceleration, targetAcceleration);
     }
     
-    private void ApplyTorque()
-    {
-        var turn = turnForce * Mathf.Lerp(torqueForce.x, torqueForce.x * (turnTiltForcePercent - Mathf.Abs(torqueForce.y)), Mathf.Max(0, torqueForce.y));
-        turnRate = Mathf.Lerp(turnRate, turn, Time.fixedDeltaTime * turnForce);
-        rigidbody.AddRelativeTorque(0, turnRate * rigidbody.mass, 0);
-        rigidbody.AddRelativeForce(new Vector3(torqueForce.x * sideForce * rigidbody.mass, 0, torqueForce.y * forwardForce * rigidbody.mass));
-    }
-
     private void ApplyTilt()
     {
-        var roll = -torqueForce.x * turnTiltForce;
-        var pitch = torqueForce.y * forwardTiltForce;
-        var targetRotation = Quaternion.Euler(pitch, rigidbody.rotation.eulerAngles.y, roll);
-
-        rigidbody.MoveRotation(Quaternion.Slerp(rigidbody.rotation, targetRotation, Time.fixedDeltaTime * tiltCoefficient));
+        var pitch = tiltForce.y * forwardTiltForce;
+        var roll = -tiltForce.x * turnTiltForce;
+        rigidbody.AddRelativeTorque(pitch, 0, roll);
     }
     
     private void MovementListener(MoveDirection moveDirection)
     {
-        var force = 0f;
-        
-        var x = torqueForce.x switch
+        var x = tiltForce.x switch
         {
             > 0 => -Time.fixedDeltaTime,
             < 0 => Time.fixedDeltaTime,
             _ => 0
         };
         
-        var y = torqueForce.y switch
+        var y = tiltForce.y switch
         {
             > 0 => -Time.fixedDeltaTime,
             < 0 => Time.fixedDeltaTime,
@@ -113,73 +96,57 @@ public class Helicopter : MonoBehaviour
                 break;
             case MoveDirection.DOWN:
                 if (grounded)
-                {
                     Message?.Invoke("You are on ground");
-                    break;
-                }
+                else
+                    engineAcceleration = Mathf.Max(0, engineAcceleration - downForce);
                 
-                engineAcceleration = Mathf.Max(0, engineAcceleration - downForce);
                 break;
             case MoveDirection.FORWARD:
                 if (grounded)
-                {
                     Message?.Invoke("You are on ground");
-                    break;
-                }
+                else
+                    y = Time.fixedDeltaTime;
                 
-                y = Time.fixedDeltaTime;
                 break;
             case MoveDirection.BACK:
                 if (grounded)
-                {
                     Message?.Invoke("You are on ground");
-                    break;
-                }
+                else
+                    y = -Time.fixedDeltaTime;
                 
-                y = -Time.fixedDeltaTime;
                 break;
             case MoveDirection.LEFT:
                 if (grounded)
-                {
                     Message?.Invoke("You are on ground");
-                    break;
-                }
+                else
+                    x = -Time.fixedDeltaTime;
                 
-                x = -Time.fixedDeltaTime;
                 break;
             case MoveDirection.RIGHT:
                 if (grounded)
-                {
                     Message?.Invoke("You are on ground");
-                    break;
-                }
+                else
+                    x = Time.fixedDeltaTime;
                 
-                x = Time.fixedDeltaTime;
                 break;
             case MoveDirection.TURN_LEFT:
                 if (grounded)
-                {
                     Message?.Invoke("You are on ground");
-                    break;
-                }
+                else
+                    rigidbody.AddRelativeTorque(0, -torqueCoefficient * rigidbody.mass, 0);    
                 
-                force = Mathf.Abs(torqueForce.y) - turnForcePercent;
-                rigidbody.AddRelativeTorque(0, force * rigidbody.mass, 0);
                 break;
             case MoveDirection.TURN_RIGHT:
                 if (grounded)
-                {
                     Message?.Invoke("You are on ground");
-                    break;
-                }
+                else
+                    rigidbody.AddRelativeTorque(0, torqueCoefficient * rigidbody.mass, 0);
                 
-                force = turnForcePercent - Mathf.Abs(torqueForce.y);
-                rigidbody.AddRelativeTorque(0, force * rigidbody.mass, 0);
                 break;
         }
         
-        torqueForce.x = Mathf.Clamp(torqueForce.x + x, -1, 1);
-        torqueForce.y = Mathf.Clamp(torqueForce.y + y, -1, 1);
+        tiltForce.x = Mathf.Clamp(tiltForce.x + x, -1, 1);
+        tiltForce.y = Mathf.Clamp(tiltForce.y + y, -1, 1);
     }
 
     private void KeyUpListener(MoveDirection moveDirection)
