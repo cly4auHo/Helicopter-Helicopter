@@ -90,56 +90,56 @@ public class Helicopter : MonoBehaviour
             tiltForce.x = Mathf.Lerp(tiltForce.x, 0, Time.fixedDeltaTime);
     }
     
-    private void MovementListener(MoveDirection moveDirection)
+    private void MovementListener(Direction direction)
     {
-        switch (moveDirection)
+        switch (direction)
         {
-            case MoveDirection.UP:
+            case Direction.UP:
                 engineAcceleration = Mathf.Min(accelerationLimit, engineAcceleration + upForce);
                 break;
-            case MoveDirection.DOWN:
+            case Direction.DOWN:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
                     engineAcceleration = Mathf.Max(0, engineAcceleration - downForce);
                 
                 break;
-            case MoveDirection.FORWARD:
+            case Direction.FORWARD:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
                     tiltForce.y = Mathf.Clamp(tiltForce.y + Time.fixedDeltaTime, -1, 1);
                 
                 break;
-            case MoveDirection.BACK:
+            case Direction.BACK:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
                     tiltForce.y = Mathf.Clamp(tiltForce.y - Time.fixedDeltaTime, -1, 1);
                 
                 break;
-            case MoveDirection.LEFT:
+            case Direction.LEFT:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
                     tiltForce.x = Mathf.Clamp(tiltForce.x - Time.fixedDeltaTime, -1, 1);
                 
                 break;
-            case MoveDirection.RIGHT:
+            case Direction.RIGHT:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
                     tiltForce.x = Mathf.Clamp(tiltForce.x + Time.fixedDeltaTime, -1, 1);
                 
                 break;
-            case MoveDirection.TURN_LEFT:
+            case Direction.TURN_LEFT:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
                     rigidbody.AddRelativeTorque(0, -torqueCoefficient, 0, ForceMode.Acceleration);    
                 
                 break;
-            case MoveDirection.TURN_RIGHT:
+            case Direction.TURN_RIGHT:
                 if (grounded)
                     Message?.Invoke("You are on ground");
                 else
@@ -149,23 +149,23 @@ public class Helicopter : MonoBehaviour
         }
     }
 
-    private void KeyUpListener(MoveDirection moveDirection)
+    private void KeyUpListener(Direction direction)
     {
-        if (moveDirection == MoveDirection.FORWARD || moveDirection == MoveDirection.BACK)
+        if (direction == Direction.FORWARD || direction == Direction.BACK)
             isPitching = false;
-        else if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
+        else if (direction == Direction.UP || direction == Direction.DOWN)
             isEngineAccelerationChanged = false;
-        else if (moveDirection == MoveDirection.LEFT || moveDirection == MoveDirection.RIGHT)
+        else if (direction == Direction.LEFT || direction == Direction.RIGHT)
             isRolling = false;
     }
 
-    private void KeyDownListener(MoveDirection moveDirection)
+    private void KeyDownListener(Direction direction)
     {
-        if (moveDirection == MoveDirection.FORWARD || moveDirection == MoveDirection.BACK)
+        if (direction == Direction.FORWARD || direction == Direction.BACK)
             isPitching = true;
-        else if (moveDirection == MoveDirection.UP || moveDirection == MoveDirection.DOWN)
+        else if (direction == Direction.UP || direction == Direction.DOWN)
             isEngineAccelerationChanged = true;
-        else if (moveDirection == MoveDirection.LEFT || moveDirection == MoveDirection.RIGHT)
+        else if (direction == Direction.LEFT || direction == Direction.RIGHT)
             isRolling = true;
     }
 

@@ -6,22 +6,22 @@ using UnityEngine.InputSystem;
 public class InputSystem : MonoBehaviour
 {
     #region bindings
-    private static readonly Dictionary<Key, MoveDirection> bindings = new()
+    private static readonly Dictionary<Key, Direction> bindings = new()
     {
-        { Key.W, MoveDirection.FORWARD },
-        { Key.S, MoveDirection.BACK },
-        { Key.A, MoveDirection.LEFT },
-        { Key.D, MoveDirection.RIGHT },
-        { Key.Q, MoveDirection.TURN_LEFT },
-        { Key.E, MoveDirection.TURN_RIGHT },
-        { Key.Space, MoveDirection.UP },
-        { Key.LeftCtrl, MoveDirection.DOWN }
+        { Key.W, Direction.FORWARD },
+        { Key.S, Direction.BACK },
+        { Key.A, Direction.LEFT },
+        { Key.D, Direction.RIGHT },
+        { Key.Q, Direction.TURN_LEFT },
+        { Key.E, Direction.TURN_RIGHT },
+        { Key.Space, Direction.UP },
+        { Key.LeftCtrl, Direction.DOWN }
     };
     #endregion
     
-    public Action<MoveDirection> Move;
-    public Action<MoveDirection> Up; 
-    public Action<MoveDirection> Down; 
+    public Action<Direction> Move;
+    public Action<Direction> Up; 
+    public Action<Direction> Down; 
     
     private void FixedUpdate()
     {
