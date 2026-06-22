@@ -11,6 +11,7 @@ public class Helicopter : MonoBehaviour
     [SerializeField] private Rigidbody rigidbody;
 
     [Header("Engine")] 
+    [SerializeField] private float accelerationLimit;
     [SerializeField] private float upForce;
     [SerializeField] private float downForce;
     [SerializeField] private float forwardForce;
@@ -94,7 +95,7 @@ public class Helicopter : MonoBehaviour
         switch (moveDirection)
         {
             case MoveDirection.UP:
-                engineAcceleration += upForce;
+                engineAcceleration = Mathf.Min(accelerationLimit, engineAcceleration + upForce);
                 break;
             case MoveDirection.DOWN:
                 if (grounded)
